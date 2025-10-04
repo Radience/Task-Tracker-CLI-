@@ -1,6 +1,8 @@
 import argparse
-import time
-import task
+import bootstrap
+
+from task import TaskManager
+from status import Status
 
 class Command():
     def __init__(self):
@@ -42,18 +44,30 @@ class Command():
         return self._parser.parse_args()
 
 commands = {
-    'add' : lambda args: task.Task(args.name),
-    'update' : lambda args: task.Task(args.name),
-    'delete' : lambda args: task.Task(args.name),
-    'mark-in-progress' : lambda args: task.Task(args.name),
-    'mark-done' : lambda args: task.Task(args.name),
-    'list' : lambda args: task.Task(args.name)
+    'add' : lambda args: TaskManager.add(**vars(args)),
+    'update' : lambda args: TaskManager.update(**vars(args)),
+    'delete' : lambda args: TaskManager.delete(**vars(args)),
+    'mark-in-progress' : lambda args: TaskManager.set_status(**vars(args), status= Status.in_progress),
+    'mark-done' : lambda args: TaskManager.set_status(**vars(args), status= Status.done),
+    'list' : lambda args: print(TaskManager.get_tasks(**vars(args)))
 }
 
-if __name__ == '__main__':
-    try:
+if __name__ == '__main__': 
+
+    '''try:
+        boot = bootstrap.Boot()
         cli = Command()
         args = cli.parse_args()
+        print(args)
         commands[args.command](args)
+        boot.save()
     except Exception as e:
-        print(type(e), e)
+        print(type(e), e)'''
+
+    boot = bootstrap.Boot()
+    cli = Command()
+    args = cli.parse_args()
+    print(args)
+    commands[args.command](args) #the namespace contains the "command" and must be deleted 
+    boot.save()
+    
